@@ -12,8 +12,8 @@ int main()
 	string c = "A4A28E711996BE9ED7B976871E170770E6B4D48DBCE916AC3D978D2146873AF4DA92CF8D023404EA5D78087C31933D8F2AF0BBE7AB619A5A07AEDBD2E3D582C05826B11F143BD80B64007F8E407DF0F1B9A7678846E0CDD1912B7DFBFBFCB1B9FFF0E54E73FA4248B24771789D2F11885F456545B9ED8C90F925F38B620677DC";
 	
 	// пункт А)
-	//cout << "input: " << a << endl << "length: " << a.length() << endl;
-	//cout << "input: " << b << endl << "length: " << b.length() << endl;
+	cout << "input: " << a << endl << "length: " << a.length() << endl;
+	cout << "input: " << b << endl << "length: " << b.length() << endl;
 	auto startplus = high_resolution_clock::now();
 	string plus = backToHex(longAdd(hexTo32(a), hexTo32(b)));
 	auto stopplus = high_resolution_clock::now();
@@ -49,25 +49,25 @@ int main()
 	cout << "a**b: " << pow << endl << "length: " << pow.length() << endl << "time: " << duration.count() << " microseconds" << endl;
 	 
 	// пункт Б)
-	//string one = backToHex(longMul(longAdd(hexTo32(a), hexTo32(b)), hexTo32(c)));
-	//string two = backToHex(longMul(hexTo32(c), longAdd(hexTo32(a), hexTo32(b))));
-	//string three = backToHex(longAdd(longMul(hexTo32(a), hexTo32(c)),longMul(hexTo32(b), hexTo32(c))));
-	//if (one.compare(two) == 0) cout << "(a+b)*c = c*(a+b)" << endl;
-	//if (one.compare(three) == 0) cout << "(a+b)*c = a*c + b*c" << endl;
-	//if (two.compare(three) == 0) cout << "c*(a+b) = a*c + b*c" << endl;
-	//string four = backToHex(longMulOneDigit(hexTo32(a), 1000));
-	//unsigned long long* temp = new unsigned long long[1000];
-	//for (int i = 0; i < 1000; i++) {
-	//	temp[i] = 0;
-	//}
-	//for (int i = 0; i < 1000; i++) {
-	//	temp = longAdd(temp, hexTo32(a));
-	//}
-	//string five = backToHex(temp);
-	//if (four.compare(five) == 0) cout << "n*a = a+a+...+a" << endl;
-	//string six = backToHex(longDivMod(longMul(hexTo32(a), hexTo32(b)), hexTo32(b)).first);
-	//if (six.compare(a) == 0) cout << "(a*b)/b = a" << endl;
-	//string seven = backToHex(longAdd(longSub(hexTo32(a), hexTo32(b)), hexTo32(b)));
-	//if (seven.compare(a) == 0) cout << "a-b+b=a" << endl;
+	string one = backToHex(longMul(longAdd(hexTo32(a), hexTo32(b)), hexTo32(c)));
+	string two = backToHex(longMul(hexTo32(c), longAdd(hexTo32(a), hexTo32(b))));
+	string three = backToHex(longAdd(longMul(hexTo32(a), hexTo32(c)),longMul(hexTo32(b), hexTo32(c))));
+	if (one.compare(two) == 0) cout << "(a+b)*c = c*(a+b)" << endl;
+	if (one.compare(three) == 0) cout << "(a+b)*c = a*c + b*c" << endl;
+	if (two.compare(three) == 0) cout << "c*(a+b) = a*c + b*c" << endl;
+	string four = backToHex(longMulOneDigit(hexTo32(a), 1000));
+	unsigned long long* temp = new unsigned long long[1000];
+	for (int i = 0; i < 1000; i++) {
+		temp[i] = 0;
+	}
+	for (int i = 0; i < 1000; i++) {
+		temp = longAdd(temp, hexTo32(a));
+	}
+	string five = backToHex(temp);
+	if (four.compare(five) == 0) cout << "n*a = a+a+...+a" << endl;
+	string six = backToHex(longDivMod(longMul(hexTo32(a), hexTo32(b)), hexTo32(b)).first);
+	if (six.compare(a) == 0) cout << "(a*b)/b = a" << endl;
+	string seven = backToHex(longAdd(longSub(hexTo32(a), hexTo32(b)), hexTo32(b)));
+	if (seven.compare(a) == 0) cout << "a-b+b=a" << endl;
 	return 0;
 }
