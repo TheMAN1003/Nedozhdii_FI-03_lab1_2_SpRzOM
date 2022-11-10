@@ -1,6 +1,7 @@
 #include <string>
 #include <algorithm>
-#include <utility>
+//#include <utility>
+#include <cstdlib>
 
 using namespace std;
 
@@ -164,7 +165,7 @@ unsigned long long* longAdd(unsigned long long* a, unsigned long long* b) {
 	return c;
 }
 
-int longCmp(unsigned long long* a, unsigned long long* b) {
+int longCmp(const unsigned long long* a, const unsigned long long* b) {
 	int i = 64;
 	while (a[i] == b[i]) i--;
 	if (i == -1) return 0;
@@ -198,11 +199,12 @@ unsigned long long* longSub(unsigned long long* a, unsigned long long* b) {
 			c[64] = 1;
 		}
 	}
+	c[64] = 0;
 	return c;
 }
 
 
-unsigned long long* longMulOneDigit(unsigned long long* a, unsigned long long b) {
+unsigned long long* longMulOneDigit(const unsigned long long* a, const unsigned long long b) {
 	unsigned long long* c = new unsigned long long[65];
 	unsigned long long temp;
 	unsigned long long bits = 32;
@@ -231,7 +233,7 @@ unsigned long long* longShiftDigitsToHigh(const unsigned long long* a, unsigned 
 	return temp;
 }
 
-unsigned long long* longMul(unsigned long long* a, unsigned long long* b) {
+unsigned long long* longMul(const unsigned long long* a, const unsigned long long* b) {
 	unsigned long long* c = new unsigned long long[257];
 	unsigned long long* temp;
 	for (int i = 0; i < 257; i++) {
@@ -314,22 +316,6 @@ pair<unsigned long long*, unsigned long long*> longDivMod(unsigned long long* a,
 	return res;
 }
 
-string numbersToHex(unsigned long long* n) {
-	string result;
-	for (int i = 63; i >= 0; i--) {
-		string temp;
-		for (int j = 0; j < 29; j += 4) {
-			temp += toHexVal(n[i] >> j & 15);
-		}
-		reverse(temp.begin(), temp.end());
-		result += temp;
-	}
-	while (result[0] == '0') {
-		result.erase(result.begin(), result.begin() + 1);
-	}
-	return result;
-}
-
 unsigned long long* longPowerWindow(unsigned long long* a, unsigned long long* b, string hex_b) {
 	unsigned long long* hex_num_b = hexToNumbers(hex_b);
 	unsigned long long* c = new unsigned long long[4096];
@@ -352,4 +338,191 @@ unsigned long long* longPowerWindow(unsigned long long* a, unsigned long long* b
 		}
 	}
 	return c;
+}
+
+unsigned long long* longShiftBitsToLow(const unsigned long long* a, unsigned long long b) {
+	unsigned long long* temp = new unsigned long long[2048];
+	for (int i = 2047; i >= 0; i--) {
+		temp[i] = a[i];
+	}
+	while (b != 0) {
+		for (int i = 0; i < 2047; i++) {
+			temp[i] = temp[i + 1];
+		}
+		temp[2047] = 0;
+		b--;
+	}
+	return temp;
+}
+
+unsigned long long* gcd(unsigned long long* a, unsigned long long* b) {
+	unsigned long long* temp = new unsigned long long[2048];
+	unsigned long long* res = new unsigned long long[65];
+	unsigned long long* a_bit = toBinary(a);
+	unsigned long long* b_bit = toBinary(b);
+	unsigned long long* zero = new unsigned long long[2048];
+	for (int i = 0; i < 2048; i++) {
+		zero[i] = 0;
+	}
+	unsigned long long* d = new unsigned long long[2048];
+	for (int i = 2047; i > 0; i--) {
+		d[i] = 0;
+	}
+	d[0] = 1;
+	while (a_bit[0] == 0 && b_bit[0] == 0) {
+		a_bit = longShiftBitsToLow(a_bit, 1);
+		b_bit = longShiftBitsToLow(b_bit, 1);
+		d = longShiftBitsToHigh(d, 1);
+	}
+	while (a_bit[0] == 0) {
+		a_bit = longShiftBitsToLow(a_bit, 1);
+	}
+	while (longCmpBit(b_bit, zero) != 0) {
+		while (b_bit[0] == 0) {
+			b_bit = longShiftBitsToLow(b_bit, 1);
+		}
+		for (int i = 2047; i >= 0; i--) {
+			temp[i] = a_bit[i];
+		}
+		if (longCmpBit(temp, b_bit) == 1) {
+			a_bit = b_bit;
+			b_bit = toBinary(longSub(fromBinary(temp), fromBinary(b_bit)));
+		}
+		else b_bit = toBinary(longSub(fromBinary(b_bit), fromBinary(temp)));
+	}
+	res = longMul(fromBinary(d), fromBinary(a_bit));
+	return res;
+}
+
+unsigned long long* lcm(unsigned long long* a, unsigned long long* b) {
+	return longMul(longDivMod(a, gcd(a, b)).first, b);
+}
+
+unsigned long long* longShiftDigitsToLow(const unsigned long long* a, unsigned long long b) {
+	unsigned long long* temp = new unsigned long long[65];
+	for (int i = 63; i >= 0; i--) {
+		temp[i] = a[i];
+	}
+	while (b != 0) {
+		for (int i = 0; i < 63; i++) {
+			temp[i] = temp[i + 1];
+		}
+		temp[63] = 0;
+		b--;
+	}
+	return temp;
+}
+
+unsigned long long* barrettReduction(unsigned long long* x, unsigned long long* n) {
+	n[64] = 0;
+	unsigned long long* b = new unsigned long long[65];
+	for (int i = 63; i > 0; i--) {
+		b[i] = 0;
+	}
+	b[0] = 1;
+	unsigned long long k = 64;
+	for (int i = 63; i >= 0; i--) {
+		if (n[i] == 0) k--;
+		else break;
+	}
+	if (k > 31) {
+		cout << "your input is too big" << endl;
+		return NULL;
+	}
+	unsigned long long* mu = longDivMod(longShiftDigitsToHigh(b, 2*k), n).first;
+	unsigned long long* q = longShiftDigitsToLow(x, k - 1);
+	q = longMul(q, mu);
+	q = longShiftDigitsToLow(q, k + 1);
+	unsigned long long* r = longSub(x, longMul(q, n));
+	while (longCmp(r, n) == 1) {
+		r = longSub(r, n);
+	}
+	return r;
+}
+
+unsigned long long* longBarOrRes(unsigned long long* a, unsigned long long* b) {
+	if (longCmp(a, longSquareTemp(b)) != 1) {
+		a = barrettReduction(a, b);
+	}
+	else {
+		a = longDivMod(a, b).second;
+	}
+	return a;
+}
+
+unsigned long long* longAddBarrett(unsigned long long* a, unsigned long long* b, unsigned long long* n) {
+	unsigned long long* res = new unsigned long long[65];
+	a = longBarOrRes(a, n);
+	b = longBarOrRes(b, n);
+	res = longBarOrRes(longAdd(a, b), n);
+	return res;
+}
+
+unsigned long long* longSubBarrett(unsigned long long* a, unsigned long long* b, unsigned long long* n) {
+	unsigned long long* res = new unsigned long long[65];
+	res = longBarOrRes(longSub(a, b), n);
+	return res;
+}
+
+unsigned long long* longMulBarrett(unsigned long long* a, unsigned long long* b, unsigned long long* n) {
+	unsigned long long* res = new unsigned long long[65];
+	a = longBarOrRes(a, n);
+	b = longBarOrRes(b, n);
+	res = longBarOrRes(longMul(a, b), n);
+	return res;
+}
+
+unsigned long long* longSqrBarrett(unsigned long long* a, unsigned long long* n) {
+	unsigned long long* res = new unsigned long long[65];
+	a = longBarOrRes(a, n);
+	res = longBarOrRes(longSquareTemp(a), n);
+	return res;
+}
+
+unsigned long long* longModPowerBarrett(unsigned long long* a, unsigned long long* b, unsigned long long* n) {
+	unsigned long long* b_bit = toBinary(b);
+	unsigned long long b_len = bitLength(b_bit);
+	unsigned long long* c = new unsigned long long[65];
+	unsigned long long k = 64;
+	for (int i = 63; i > 0; i--) {
+		c[i] = 0;
+	}
+	c[0] = 1;
+	for (int i = 63; i >= 0; i--) {
+		if (n[i] == 0) k--;
+		else break;
+	}
+	if (k > 31) {
+		cout << "your input is too big" << endl;
+		return NULL;
+	}
+	unsigned long long* mu = longDivMod(longShiftDigitsToHigh(b, 2 * k), n).first;
+	for (int i = 0; i < b_len; i++) {
+		if (b_bit[i] == 1) {
+			c = longBarOrRes(longMul(c, a), n);
+		}
+		a = longBarOrRes(longSquareTemp(a), n);
+
+	}
+	return c;
+}
+
+string genHex(string n) {
+	char hex_characters[] = { '0','1','2','3','4','5','6','7','8','9','A','B','C','D','E','F' };
+	string str;
+	int len = rand() % (n.length() - 3) + 2;
+	for (int i = 0; i < len; i++)
+	{
+		str[i] = hex_characters[rand() % 16];
+	}
+	return str;
+}
+
+bool primSolStr(int k, string n) {
+	bool isprim = false;
+	for (int i = 0; i < k; i++) {
+		string a = genHex(n);
+
+	}
+	return isprim;
 }
