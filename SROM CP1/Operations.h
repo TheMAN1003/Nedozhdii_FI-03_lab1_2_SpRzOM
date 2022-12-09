@@ -525,5 +525,4 @@ bool primSolStr(int k, string n) {
 
 	}
 	return isprim;
-
 }

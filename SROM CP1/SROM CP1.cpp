@@ -156,5 +156,4 @@ int main()
 	string eight_1 = backToHex(longModPowerBarrett(hexTo32(g_1), hexTo32("1116"), hexTo32("19A1")));
 	if (eight_1.compare("1") == 0) cout << "a**(2*3**(k-1))=1 mod 3**k" << endl;
 	return 0;
-
 }
